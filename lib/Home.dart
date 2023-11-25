@@ -13,34 +13,25 @@ class _HomeState extends State<Home> {
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight + 48), // Kích thước tối ưu cho AppBar và TabBar
-          child: Stack(
-            children: [
-              AppBar(
-                title: const Text(
-                  "MY HOT Vinhome",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black),
-                ),
+        appBar: AppBar(
+          title: const Text(
+            "MY HOT Vinhome",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black),
+          ),
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(40), // Kích thước tối ưu cho TabBar
+            child: Container(
+              color: Colors.orange,
+              child: const TabBar(
+                tabs: [
+                  Tab(text: 'Tất cả'),
+                  Tab(text: 'Sảnh'),
+                  Tab(text: 'Phòng'),
+                  Tab(text: 'Khác'),
+                ],
+                indicatorColor: Colors.black,
               ),
-              Positioned(
-                top: kToolbarHeight,
-                left: 0,
-                right: 0,
-                child: Container(
-                  color: Colors.orange,
-                  child: const TabBar(
-                    tabs: [
-                      Tab(text: 'Tất cả'),
-                      Tab(text: 'Sảnh'),
-                      Tab(text: 'Phòng'),
-                      Tab(text: 'Khác'),
-                    ],
-                    indicatorColor: Colors.black,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
         body: TabBarView(
@@ -80,3 +71,4 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
