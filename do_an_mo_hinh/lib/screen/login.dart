@@ -1,18 +1,42 @@
+import 'dart:ffi';
+
+
 import 'package:do_an_mo_hinh/screen/forgot_password.dart';
 import 'package:do_an_mo_hinh/screen/register.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
   Login({super.key});
-  String tb = "";
-  final txt_us = TextEditingController();
-  final txt_pass = TextEditingController();
+  
 
   @override
   State<Login> createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
+  String tb = "";
+  final txt_us = TextEditingController();
+  final txt_pass = TextEditingController();
+  
+  void signUserIn()async{
+
+    showDialog(context: context, builder:(context){
+      return const Center(
+        child:  CircularProgressIndicator(),
+      );
+    });
+    try{
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: txt_us.text, password: txt_pass.text);
+    }on FirebaseAuthException catch(e){
+      if(e.code == 'user-not-found'){
+        print( 'Email không hợp lệ');
+      }else if(e.code == 'wrong-password'){
+        print('Mật khẩu không đúng');
+      }
+    }
+    Navigator.pop(context)
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +82,7 @@ class _LoginState extends State<Login> {
                       border: InputBorder.none,
                       hintText: 'Nhập emal hoặt số điện thoại',
                     ),
-                    controller: widget.txt_us,
+                    controller: txt_us,
                   ),
                 ),                
               ),             
@@ -81,7 +105,7 @@ class _LoginState extends State<Login> {
                       border: InputBorder.none,
                       hintText: 'Nhập mật khẩu',
                     ),
-                    controller: widget.txt_pass,
+                    controller: txt_pass,
                   ),
                 ),
               ),
@@ -104,6 +128,30 @@ class _LoginState extends State<Login> {
 
             SizedBox(height: 10,),
             ElevatedButton(
+
+              // onPressed: () {
+              //   // Hiển thị hộp thoại đổi mật khẩu
+              //   showDialog(
+              //     context: context,
+              //     builder: (BuildContext context) {
+              //       return AlertDialog(
+              //         title: Text("Đổi mật khẩu"),
+              //         content: Text("Nội dung đổi mật khẩu ở đây..."),
+              //         actions: [
+              //           TextButton(
+              //             onPressed: () {
+              //               Navigator.pop(context);
+              //             },
+              //             child: Text("Đóng"),
+              //           ),
+              //         ],
+              //       );
+              //     },
+              //   );
+              // },
+
+
+
               style: ButtonStyle(
                 backgroundColor: MaterialStatePropertyAll<Color>(
                   Colors.blue.withOpacity(0.8),
@@ -116,33 +164,48 @@ class _LoginState extends State<Login> {
 
                  /////Kiểm tra mật khẩu///////
                 setState(() {
-                          if(widget.txt_us.text.isEmpty || widget.txt_pass.text.isEmpty){
-                            widget.tb = "Vui lòng nhập đầy đủ thông tin";
+                          if(txt_us.text.isEmpty ||txt_pass.text.isEmpty){
+                            tb = "Vui lòng nhập đầy đủ thông tin";
                           }
-                          else if(widget.txt_pass.text.length < 6){
-                            widget.tb = "Vui lòng nhập lại mật khẩu, kí tự tối thiểu là 6";
+                          else if(txt_pass.text.length < 6){
+                            tb = "Vui lòng nhập lại mật khẩu, kí tự tối thiểu là 6";
                           }
-                          else if(widget.txt_pass.text.length > 32){
-                            widget.tb = "Vui lòng nhập lại mật khẩu, kí tự tối đa là 32";
-                          }else if(widget.txt_pass.text.length > 32){
-                            widget.tb = "Vui lòng nhập lại mật khẩu, kí tự tối đa là 32";
+                          else if(txt_pass.text.length > 32){
+                            tb = "Vui lòng nhập lại mật khẩu, kí tự tối đa là 32";
+                          }else if(txt_pass.text.length > 32){
+                            tb = "Vui lòng nhập lại mật khẩu, kí tự tối đa là 32";
                           }
-                          else if(!widget.txt_pass.text.contains(RegExp(r'[!@#\$%^&*()_+={}\[\]:;<>,.?~]'))){
-                            widget.tb = "  Vui lòng nhập lại mật khẩu, kí tự phải có 1 kí tự đặc biệt";
-                          }else if(widget.txt_us.text.length < 6){
-                            widget.tb = "Vui lòng nhập đủ 6 ký tự";
+                          else if(txt_pass.text.contains(RegExp(r'[!@#\$%^&*()_+={}\[\]:;<>,.?~]'))){
+                            tb = "  Vui lòng nhập lại mật khẩu, kí tự phải có 1 kí tự đặc biệt";
+                          }else if(txt_us.text.length < 6){
+                            tb = "Vui lòng nhập đủ 6 ký tự";
                           }
                           else{
                             Navigator.popUntil(context, (route) => route.isFirst);
                             Navigator.pushNamed(context, '/Home');
-                            widget.tb = "Đăng nhập thành công";
+                            tb = "Đăng nhập thành công";
                           }
-                        })
+                        }),
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("Thông báo"),
+                                content: Text(tb),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("Đóng"),
+                                  ),
+                                ],
+                              );
+                            },
+                          )
               }, child: Padding(padding: EdgeInsets.fromLTRB(50, 13, 50, 13),child: Text('Đăng nhập'), 
               ),
-              ),const Padding(padding: EdgeInsets.fromLTRB(10, 10, 10, 10)),
-                      Text(widget.tb,style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.red),),
-
+              ),
             
             /////Chưa có tài khoản//////
           

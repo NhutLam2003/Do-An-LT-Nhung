@@ -30,7 +30,7 @@ class _forgot_passState extends State<forgot_pass> {
 
           SizedBox(height: 10,),
 
-          Text("Vui lòng nhập đúng tài khoản gmail!",
+          Text("Nhập cho đúng Gmail nha mày:))",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20),textAlign: TextAlign.center,),

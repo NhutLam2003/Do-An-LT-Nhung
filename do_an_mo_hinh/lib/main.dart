@@ -1,8 +1,17 @@
+import 'package:do_an_mo_hinh/firebase_options.dart';
+import 'package:do_an_mo_hinh/screen/home.dart';
 import 'package:do_an_mo_hinh/screen/login.dart';
 import 'package:do_an_mo_hinh/screen/register.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform
+    );
   runApp(const MyApp());
 }
 
@@ -14,13 +23,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return  MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'My Vinhhome',
+      title: 'My BarClub',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       initialRoute: '/',
       routes: {
         '/':(context)=> Login(),
+        '/Home':(context)=> Home(),
       },
     );
   }
