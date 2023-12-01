@@ -1,19 +1,73 @@
 import 'package:do_an_mo_hinh/screen/login.dart';
+import 'package:do_an_mo_hinh/setting/button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 
 class register extends StatefulWidget {
-  register({super.key});
-  String tb = "";
-  final txt_us = TextEditingController();
-  final txt_pass = TextEditingController();
-    final txt_pass2 = TextEditingController();
-  final txt_sdt = TextEditingController();
+  final Function()? onTap;
+  register({super.key,required this.onTap});
   @override
   State<register> createState() => _registerState();
 }
 
 class _registerState extends State<register> {
+      final txt_email = TextEditingController();
+      final txt_us = TextEditingController();
+      final txt_pass = TextEditingController();
+      final txt_pass2 = TextEditingController();
+      final txt_sdt = TextEditingController();
+
+      void signUserUn()async{
+        try{
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: txt_email.text, 
+          password: txt_pass.text
+          );
+        Navigator.pop(context);
+        }on FirebaseAuthException catch(e){
+          showDialog(context: context, builder: (BuildContext){
+            if(txt_us.text.isEmpty || txt_pass.text.isEmpty||txt_pass2.text.isEmpty||txt_sdt.text.isEmpty||txt_email.text.isEmpty){
+              return AlertDialog(
+              title: Text('Vui lòng nhập đầy đủ thông tin'),
+              actions: [
+                TextButton(onPressed: (){
+                  Navigator.of(context).pop();
+                }, child: Text('OK'))
+              ],
+            );
+            }else if(txt_sdt.text.length<10||txt_sdt.text.length>10){
+              return AlertDialog(
+              title: Text('Số điện thoại không hợp lệ'),
+              actions: [
+                TextButton(onPressed: (){
+                  Navigator.of(context).pop();
+                }, child: Text('OK'))
+              ],
+            );
+            }else if(txt_pass.text != txt_pass2.text){
+              return AlertDialog(
+              title: Text('Số điện thoại không hợp lệ '),
+              actions: [
+                TextButton(onPressed: (){
+                  Navigator.of(context).pop();
+                }, child: Text('OK'))
+              ],
+            );
+            }else{
+              return AlertDialog(
+                title: Text('Lỗi đăng nhập tài khoản đã tồn tại hoặt email không hợp lệ'),
+                actions: [
+                  TextButton(onPressed: (){
+                    Navigator.of(context).pop();
+                  }, child: Text('OK'))
+                ],
+              );
+            }
+        });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
@@ -24,11 +78,11 @@ class _registerState extends State<register> {
           child : Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 50,),
+              SizedBox(height: 30,),
               Icon(
                 Icons.key,size: 100,
               ),
-              SizedBox(height: 75,),
+              SizedBox(height: 30,),
           ////Text khới đầu//////////
           Text("WELCOME!",
           style: TextStyle(
@@ -59,6 +113,7 @@ class _registerState extends State<register> {
                       border: InputBorder.none,
                       hintText: 'Nhập tên người dùng',
                     ),
+                    controller: txt_us,
                   ),
                 ),                
               ),             
@@ -81,7 +136,7 @@ class _registerState extends State<register> {
                       border: InputBorder.none,
                       hintText: 'Nhập email',
                     ),
-                    controller: widget.txt_us,
+                    controller: txt_email,
                   ),
                 ),                
               ),             
@@ -103,7 +158,7 @@ class _registerState extends State<register> {
                       border: InputBorder.none,
                       hintText: 'Nhập số điện thoại',
                     ),
-                    controller: widget.txt_sdt,
+                    controller: txt_sdt,
                   ),
                 ),
               ),
@@ -128,7 +183,7 @@ class _registerState extends State<register> {
                       border: InputBorder.none,
                       hintText: 'Nhập mật khẩu',
                     ),
-                    controller: widget.txt_pass,
+                    controller: txt_pass,
                   ),
                 ),
               ),
@@ -151,60 +206,17 @@ class _registerState extends State<register> {
                       border: InputBorder.none,
                       hintText: 'Nhập lại mật khẩu',
                     ),
-                    controller: widget.txt_pass2,
+                    controller: txt_pass2,
                   ),
                 ),
               ),
             ),
             /////Nút đăng nhập/////////
-           
-            
-            
             SizedBox(height: 10,),
 
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll<Color>(
-                  Colors.blue.withOpacity(0.8),
-                ),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0)
-                ))
-              ),
-              onPressed: () =>{
-
-                 /////Kiểm tra mật khẩu///////
-                setState(() {
-                          if(widget.txt_us.text.isEmpty || widget.txt_pass.text.isEmpty){
-                            widget.tb = "Vui lòng nhập đầy đủ thông tin";
-                          }
-                          else if(widget.txt_pass.text.length < 6){
-                            widget.tb = "Vui lòng nhập lại mật khẩu, kí tự tối thiểu là 6";
-                          }
-                          else if(widget.txt_pass.text.length > 32){
-                            widget.tb = "Vui lòng nhập lại mật khẩu, kí tự tối đa là 32";
-                          }
-                          else if(!widget.txt_pass.text.contains(RegExp(r'[!@#\$%^&*()_+={}\[\]:;<>,.?~]'))){
-                            widget.tb = "  Vui lòng nhập lại mật khẩu, kí tự phải có 1 kí tự đặc biệt";
-                          }else if(widget.txt_us.text.length < 6){
-                            widget.tb = "Vui lòng nhập đủ 6 ký tự";
-                          }else if(widget.txt_sdt.text.length < 10 || widget.txt_sdt.text.length >10){
-                            widget.tb = " Số điện thoại nhập không đúng";
-                          }else if(widget.txt_pass.text != widget.txt_pass2.text){
-                            widget.tb = " Mật khẩu không trùng";
-                          }
-                          else{
-                            Navigator.popUntil(context, (route) => route.isFirst);
-                            Navigator.pushNamed(context, '/Home');
-                            widget.tb = "Đăng ký thành công";
-                          }
-                        })
-              }, child: Padding(padding: EdgeInsets.fromLTRB(50, 13, 50, 13),child: Text('Đăng ký'), 
-              ),
-              ),const Padding(padding: EdgeInsets.fromLTRB(10, 10, 10, 10)),
-                      Text(widget.tb,style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.red),),
-
-            
+            MyButton(
+              text: "Đăng ký",
+              onTap: signUserUn,),
             /////Chưa có tài khoản//////
           
             SizedBox(height: 25,),
@@ -212,7 +224,7 @@ class _registerState extends State<register> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 GestureDetector(
-                onTap: () {login(context);},
+                onTap: widget.onTap,
                 child:
                 Text('Quay lại đăng nhập',style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,decoration: TextDecoration.underline),),
             )],
@@ -224,9 +236,9 @@ class _registerState extends State<register> {
     );
   }
   ////chuyển trang khi bấm đăng ký/////
-  void login(BuildContext context){
-      Navigator.push(  
-      context, 
-      MaterialPageRoute(builder: (context)=>Login()));
-  }
+  // void login(BuildContext context){
+  //     Navigator.push(  
+  //     context, 
+  //     MaterialPageRoute(builder: (context)=>Login()));
+  // }
 }

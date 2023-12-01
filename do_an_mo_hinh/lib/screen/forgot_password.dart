@@ -1,14 +1,47 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class forgot_pass extends StatefulWidget {
    forgot_pass({super.key});
-   String tb = "";
-   final txt_us = TextEditingController();
+
   @override
   State<forgot_pass> createState() => _forgot_passState();
 }
 
 class _forgot_passState extends State<forgot_pass> {
+     final txt_us = TextEditingController();
+  @override
+  void dispose (){
+    txt_us.dispose();
+    super.dispose();
+  }
+  Future pass_reset()async{
+    try{
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: txt_us.text.trim());
+      showDialog(context: context, builder: (context){
+          return AlertDialog(
+          title: Text('Nhận thông báo thay đổi password ở Gmail!'),
+          actions: [
+            TextButton(onPressed: (){
+              Navigator.of(context).pop();
+            }, child: Text('OK'))
+          ],
+        );
+      });
+    }on FirebaseAuthException catch(e){
+      showDialog(context: context, builder: (context){
+          return AlertDialog(
+          title: Text('Không tìm thấy email!'),
+          actions: [
+            TextButton(onPressed: (){
+              Navigator.of(context).pop();
+            }, child: Text('OK'))
+          ],
+        );
+      });
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +63,7 @@ class _forgot_passState extends State<forgot_pass> {
 
           SizedBox(height: 10,),
 
-          Text("Nhập cho đúng Gmail nha mày:))",
+          Text("Nhập đúng Gmail đã dùng để đăng ký",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20),textAlign: TextAlign.center,),
@@ -51,32 +84,15 @@ class _forgot_passState extends State<forgot_pass> {
                       border: InputBorder.none,
                       hintText: 'Nhập email',
                     ),
-                    controller: widget.txt_us,
+                    controller: txt_us,
                   ),
                 ),                
               ),             
             ),
 
             SizedBox(height: 10,),
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll<Color>(
-                  Colors.blue.withOpacity(0.8),
-                ),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0)
-                ))
-              ),
-              onPressed: () =>{
-                setState(() {
-                  ////chuyển trang//////
-                            // Navigator.popUntil(context, (route) => route.isFirst);
-                            // Navigator.pushNamed(context, '/Home');
-                        })
-              }, child: Padding(padding: EdgeInsets.fromLTRB(50, 13, 50, 13),child: Text('Tìm'), 
-              ),
-              ),const Padding(padding: EdgeInsets.fromLTRB(10, 10, 10, 10)),
-                      Text(widget.tb,style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.red),),
+            MaterialButton(onPressed: pass_reset,
+            child: Text('Reset password!',style: TextStyle(color: Colors.white),),color: Colors.blue,)
         ]),
       ))
     );

@@ -1,5 +1,6 @@
 import 'package:do_an_mo_hinh/screen/home.dart';
 import 'package:do_an_mo_hinh/screen/login.dart';
+import 'package:do_an_mo_hinh/setting/login_or_register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +13,21 @@ class auth extends StatelessWidget {
     return Scaffold(
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context,snapshot){
-        if(snapshot.hasData){
-          return const Home();
-      }else{
-        return  Login();
-      }}),
+        builder: (BuildContext context,AsyncSnapshot snapshot){
+          if(snapshot.hasError){
+            return Text(snapshot.error.toString());
+          }
+          if(snapshot.connectionState==ConnectionState.active){
+                if(snapshot.data==null){
+                    return Logon_or_register();
+                }
+                else{
+                    return Home();
+                }
+          }
+          return Center(child: CircularProgressIndicator(),);
+      }
+      ),
     );
   }
 }
